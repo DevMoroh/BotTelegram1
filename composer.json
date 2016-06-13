@@ -1,5 +1,5 @@
 {
-  "name": "modelfak/BotTelegram",
+  "name": "modelfak/bot-telegram",
   "description": "BotTelegram",
   "require": {
     "php": ">=5.3.3"
