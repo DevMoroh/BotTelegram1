@@ -1,4 +1,4 @@
-<?php namespace App;
+<?php namespace BotTelegram\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
