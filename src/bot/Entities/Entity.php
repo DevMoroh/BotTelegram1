@@ -1,6 +1,6 @@
 <?php
 
-namespace BotTelegram\Entities;
+namespace BotTelegram\bot\Entities;
 
 class Entity {
 

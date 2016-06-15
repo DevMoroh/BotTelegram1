@@ -10,7 +10,7 @@
  * Written by Marco Boretto <marco.bore@gmail.com>
  */
 
-namespace BotTelegram\Entities;
+namespace BotTelegram\bot\Entities;
 
 use BotTelegram\Exception\TelegramException;
 use BotTelegram\Entities\Entity;

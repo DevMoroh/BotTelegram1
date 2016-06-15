@@ -1,6 +1,6 @@
 <?php
 
-namespace modelfak\BotTel\Controllers;
+namespace BotTelegram\Controllers;
 use Illuminate\Routing\Controller;
 
 class BotRequestController extends Controller{

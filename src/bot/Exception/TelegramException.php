@@ -1,7 +1,7 @@
 <?php
 
 
-namespace BotTelegram\Exception;
+namespace BotTelegram\bot\Exception;
 
 /**
  * Main exception class used for exception handling

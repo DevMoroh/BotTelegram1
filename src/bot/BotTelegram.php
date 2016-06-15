@@ -1,6 +1,6 @@
 <?php
 
-namespace BotTelegram;
+namespace BotTelegram\bot;
 
 //use BotTelegram\Request;
 

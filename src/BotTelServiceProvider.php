@@ -1,4 +1,6 @@
-<?php namespace Modelfak\BotTel;
+ <?php 
+ 
+ namespace BotTelegram;
 
 use Illuminate\Support\ServiceProvider;
 

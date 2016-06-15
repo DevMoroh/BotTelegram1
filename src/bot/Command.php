@@ -6,7 +6,7 @@
  * Time: 16:54
  */
 
-namespace BotTelegram;
+namespace BotTelegram\bot;
 
 use BotTelegram\BotTelegram as Bot;
 
