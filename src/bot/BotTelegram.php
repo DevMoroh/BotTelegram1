@@ -196,10 +196,12 @@ class BotTelegram {
 
     public function sendAswer($command, $chat_id) {
        $answere = CommandsTelegram::where('type', $command)->where('status', 1)->first();
-        $this->sendMessage([
-            'text' => $answere->message,
-            'chat_id' => $chat_id
-        ]);
+        if($answere) {
+            $this->sendMessage([
+                'text' => $answere->message,
+                'chat_id' => $chat_id
+            ]);
+        }
     }
 
 }
