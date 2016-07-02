@@ -59,15 +59,11 @@ class BotRequestController extends Controller{
         if($notification->start == 1) {
             return response()->json(['text'=>"Рассылка <b>{$notification->name}</b> уже запущена....", 'status'=>'FAIL']);
         }
-
         $notification->start = 1;
 
-
-        unset($input['id']);
         $notification->update($input);
         $notification->save();
         if($notification->start == 1) {
-            $queue = 'send'.$notification->id;
             $users = UserService::where('status', 1)
                 ->where('external_id', '!=', 0)
                 ->where('subscribe', 1)

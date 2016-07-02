@@ -31,6 +31,7 @@ class BasePusher implements WampServerInterface {
         $conn->callError($id, $topic, 'You are not allowed to make calls')->close();
     }
     public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible) {
+        echo "New psuh {$topic->getId()}";
         // In this application if clients send data it's because the user hacked around in console
         $conn->close();
     }

@@ -100,7 +100,7 @@
     </div>
 
     <script>
-        var API_URL = 'http://' + location.host + '/bot-telegram/notifications';
+        var API_URL = window.location.protocol+'//' + location.host + '/bot-telegram/notifications';
         var $table = $('#table').bootstrapTable({url: API_URL}),
                 $modal = $('#modal').modal({show: false}),
                 $alert = $('.alert').hide();
@@ -293,8 +293,6 @@
 
     </script>
     <script src="/vendor/unisharp/laravel-ckeditor/ckeditor.js"></script>
-    <script src="http://autobahn.s3.amazonaws.com/js/autobahn.min.js"></script>
-
     <script>
         $(function() {
             CKEDITOR.on( 'instanceReady', function( ev ) {

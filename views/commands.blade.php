@@ -82,7 +82,7 @@
     </div><!-- /.modal -->
     <script>
         $.ajaxSetup({ headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' } });
-        var API_URL = 'http://' + location.host + '/bot-telegram/commands';
+        var API_URL = window.location.protocol+'//' + location.host + '/bot-telegram/commands';
         var $table = $('#table').bootstrapTable({url: API_URL}),
                 $modal = $('#modal').modal({show: false}),
                 $alert = $('.alert').hide();

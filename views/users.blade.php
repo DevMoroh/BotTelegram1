@@ -57,7 +57,7 @@
         'click .remove': function (e, value, row) {
             if (confirm('Вы уверены что хотите удалить юзера?')) {
 
-                var API_URL = 'https://' + location.host + '/bot-telegram/users';
+                var API_URL = window.location.protocol+'//' + location.host + '/bot-telegram/users';
 
                 var $table = $('#table').bootstrapTable({url: API_URL}),
                         $modal = $('#modal').modal({show: false}),

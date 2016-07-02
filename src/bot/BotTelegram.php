@@ -4,8 +4,8 @@ namespace BotTelegram\bot;
 
 //use BotTelegram\Request;
 
-use App\Commands\BotSaveUpdates;
-use App\Events\BotGeneration;
+//use App\Events\BotGeneration;
+use App\Jobs\BotSaveUpdates;
 use BotTelegram\bot\Entities\Message;
 use BotTelegram\bot\Entities\Update;
 use BotTelegram\bot\Entities\User;

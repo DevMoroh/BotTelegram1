@@ -26,6 +26,7 @@
     <script src="/assets/js/easypiechart-data.js"></script>
     <script src="/assets/js/bootstrap-datepicker.js"></script>
     <script src="/assets/js/bootstrap-table.js"></script>
+    <script src="/assets/js/jquery.toaster.js"></script>
     <script src="/assets/js/main.js"></script>
 </head>
 

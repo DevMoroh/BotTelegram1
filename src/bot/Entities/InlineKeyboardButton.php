@@ -2,8 +2,7 @@
 
 namespace BotTelegram\bot\Entities;
 
-use BotTelegram\Exception\TelegramException;
-use BotTelegram\Entities\Entity;
+use BotTelegram\bot\Exception\TelegramException;
 
 class InlineKeyboardButton extends Entity
 {

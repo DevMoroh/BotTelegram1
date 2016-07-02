@@ -10,8 +10,6 @@ Route::group(['prefix'=>'bot-telegram','namespace' => 'BotTelegram\Controllers',
 
     Route::any('/', ['as' => 'bot-telegram-index','uses' => 'BotRequestController@index']);
 
-    Route::any('/hook', ['as' => 'bot-telegram-hook','uses' => 'BotRequestController@hook']);
-
     Route::get('/users_list', ['as'=>'bot-telegram-users_list','uses' => 'BotRequestController@users_list']);
 
     Route::get('/commands_list', ['as'=>'bot-telegram-commands_list','uses' => 'BotRequestController@commands_list']);
@@ -65,3 +63,5 @@ Route::group(['prefix'=>'bot-telegram','namespace' => 'BotTelegram\Controllers',
     });
 
 });
+
+Route::any('/bot-telegram/hook', ['as' => 'bot-telegram-hook','uses' => 'BotTelegram\Controllers\BotRequestController@hook', 'middleware'=>['web']]);
