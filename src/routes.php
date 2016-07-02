@@ -29,7 +29,7 @@ Route::group(['prefix'=>'bot-telegram','namespace' => 'BotTelegram\Controllers',
     Route::get('fileentry/issetfiles/{id}/{type}',  ['as' => 'issetfiles', 'uses' =>'FileEntryController@issetFiles'])->where('id', '[0-9]+');
     Route::get('fileentry/delete/{id}',  ['as' => 'deletefiles', 'uses' =>'FileEntryController@delete'])->where('id', '[0-9]+');
 
-    Route::post('sendNotifications', 'BotRequestController@sendNotifications');
+    Route::post('sendNotifications', ['uses'=>'BotRequestController@sendNotifications', 'middleware'=>['logdb']]);
 
 //    Route::get('startEvent', function() {
 //        $data = [

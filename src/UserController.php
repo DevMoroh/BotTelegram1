@@ -21,7 +21,7 @@ class UserController extends BaseController {
     }
 
     public function bot() {
-        $BotTelegram = new BotTelegram('187976149:AAGd8bwRSezwFfp3ZYcIq-PA2j6cTU1vrZM', '');
+        $BotTelegram = new BotTelegram('187976149:-PA2j6cTU1vrZM', '');
         $result = $BotTelegram->getMe();
 
         $data = [
@@ -39,7 +39,7 @@ class UserController extends BaseController {
 
     public function hook() {
 
-        $BotTelegram = new BotTelegram('187976149:AAGd8bwRSezwFfp3ZYcIq-PA2j6cTU1vrZM', '');
+        $BotTelegram = new BotTelegram('187976149:-PA2j6cTU1vrZM', '');
         $data = $BotTelegram->getData();
         $message = $data['message'];
         $chatId  = $data['chat_id'];
@@ -110,14 +110,14 @@ class UserController extends BaseController {
 
 
     public function setWebHook() {
-        $BotTelegram = new BotTelegram('187976149:AAGd8bwRSezwFfp3ZYcIq-PA2j6cTU1vrZM', '');
+        $BotTelegram = new BotTelegram('187976149:-PA2j6cTU1vrZM', '');
         $response = $BotTelegram->setHook(['url' => 'https://php-modelfak.rhcloud.com/hook']);
 
         return response()->json($response);
     }
 
     public function getUpdates() {
-        $BotTelegram = new BotTelegram('187976149:AAGd8bwRSezwFfp3ZYcIq-PA2j6cTU1vrZM', '');
+        $BotTelegram = new BotTelegram('187976149:-PA2j6cTU1vrZM', '');
         $response = $BotTelegram->getUpdates([]);
         return response()->json($response);
     }

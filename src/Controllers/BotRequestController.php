@@ -8,6 +8,7 @@ use BotTelegram\Models\Notifications;
 use BotTelegram\Models\UserService;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -64,6 +65,7 @@ class BotRequestController extends Controller{
         $notification->update($input);
         $notification->save();
         if($notification->start == 1) {
+
             $users = UserService::where('status', 1)
                 ->where('external_id', '!=', 0)
                 ->where('subscribe', 1)
@@ -82,6 +84,8 @@ class BotRequestController extends Controller{
                 }
             }
         }
+        //$queries = DB::getQueryLog();
+        //var_dump($queries);
         return response()->json(['text'=>"Рассылка <b>{$notification->name}</b> запущена успешно!", 'status'=>'OK']);
     }
 
