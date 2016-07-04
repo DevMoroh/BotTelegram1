@@ -2,13 +2,13 @@
 
 namespace BotTelegram\Controllers;
 use App\Jobs\SendNotifications;
+use App\Jobs\SendUsers;
 use BotTelegram\bot\Test;
 use BotTelegram\Console\Commands\Clearer;
 use BotTelegram\Models\Notifications;
 use BotTelegram\Models\UserService;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -44,13 +44,13 @@ class BotRequestController extends Controller{
     public function notifications_list() {
         return View::make('bot-telegram::notifications');
     }
-    
+
     public function sendNotifications(Request $request) {
 
 //        $notifications = Notifications::where('status', 1)
 //            ->first();
 //        $notifications->photo;
-       // $result = Artisan::call('queue:listen');
+        // $result = Artisan::call('queue:listen');
         $input = $request->input();
         $notification = Notifications::where('status', 1)->find($input['id']);
         if(!$notification){
@@ -66,37 +66,21 @@ class BotRequestController extends Controller{
         $notification->save();
         if($notification->start == 1) {
 
-            $users = UserService::where('status', 1)
-                ->where('external_id', '!=', 0)
-                ->where('subscribe', 1)
-                ->limit(10)
-                ->get();
-
-            if ($users) {
-                $uc = count($users);
-                foreach ($users as $key => $user) {
-                    $index = $key + 1;
-                    $status = ($uc > $index) ? 'next' : 'last';
-                    $this->dispatch(
-                        new SendNotifications($user, $notification, $index, $status)
-                    );
-                    //Artisan::call('queue:work', ['--queue' => $queue]);
-                }
-            }
+            $this->dispatch(
+                new SendNotifications($notification)
+            );
         }
-        //$queries = DB::getQueryLog();
-        //var_dump($queries);
         return response()->json(['text'=>"Рассылка <b>{$notification->name}</b> запущена успешно!", 'status'=>'OK']);
     }
 
 
     public function sendTest() {
-        
+
         $test = new Test();
 
         $test->send();
     }
-    
+
     public function addTestAccounts() {
 
         $mid = 1000000;
@@ -132,7 +116,7 @@ class BotRequestController extends Controller{
     public function hook() {
         $BotTelegram = app('BotTelegram');
         $BotTelegram->handle();
-        
+
     }
-    
+
 }
