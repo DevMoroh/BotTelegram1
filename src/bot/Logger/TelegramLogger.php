@@ -26,7 +26,7 @@ class TelegramLogger {
         $log = new Logger('name');
         $log->pushHandler(new StreamHandler(__DIR__.'/logs/'.$filename.'.log', Logger::WARNING));
 
-            $log->addWarning('Foo' . var_export($data, true));
+        $log->addWarning(var_export($data, true));
     }
 
     public static function writeDb($data) {
