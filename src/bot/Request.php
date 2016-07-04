@@ -57,7 +57,8 @@ trait Request {
                 rewind($verbose_curl_output);
                 $verboseLog = stream_get_contents($verbose_curl_output);
                 fclose($verbose_curl_output);
-                TelegramLogger::writeDb('Verbose curl output:' . htmlspecialchars($verboseLog));
+
+                TelegramLogger::writeLog(htmlspecialchars($verboseLog), 'updates');
             }
             curl_close($curl);
 
@@ -223,8 +224,7 @@ trait Request {
     public function getDataInput() {
         $data = file_get_contents('php://input');
         if($data) {
-            $logger = new TelegramLogger();
-            $logger->writeLog($data, 'updates');
+            TelegramLogger::writeLog($data, 'updates');
         }
 //        var_dump(json_decode($data, true));exit;
         return json_decode($data, true);
