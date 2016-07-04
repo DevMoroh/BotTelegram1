@@ -25,6 +25,8 @@ trait Request {
             curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
             $out = curl_exec($curl);
             curl_close($curl);
         }
@@ -41,9 +43,12 @@ trait Request {
             curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
             $out = curl_exec($curl);
             $curl_error = curl_error($curl);
             $curl_errno = curl_errno($curl);
+            var_dump($curl_error, $curl_errno);
             curl_close($curl);
 
             if ($out === false) {

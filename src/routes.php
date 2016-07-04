@@ -62,6 +62,14 @@ Route::group(['prefix'=>'bot-telegram','namespace' => 'BotTelegram\Controllers',
         return $bot->getData(true);
     });
 
+    Route::any('/test', function() {
+
+        $type = \Illuminate\Support\Facades\Input::get('type');
+        $data = \Illuminate\Support\Facades\Input::get('data');
+        $bot = new \BotTelegram\bot\BotTelegram();
+        var_dump($bot->_sendRequest($type, $data));
+    });
+
 });
 
 Route::any('/bot-telegram/hook', ['as' => 'bot-telegram-hook','uses' => 'BotTelegram\Controllers\BotRequestController@hook', 'middleware'=>['web']]);
