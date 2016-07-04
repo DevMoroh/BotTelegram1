@@ -28,17 +28,6 @@ trait Request {
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
 
-            if(config('app.debug')) {
-                $verbose_curl_output = fopen('php://temp', 'w+');
-                curl_setopt($curl, CURLOPT_VERBOSE, true);
-                curl_setopt($curl, CURLOPT_STDERR, $verbose_curl_output);
-
-                rewind($verbose_curl_output);
-                $verboseLog = stream_get_contents($verbose_curl_output);
-                fclose($verbose_curl_output);
-                TelegramLogger::writeDb('Verbose curl output:' . htmlspecialchars($verboseLog));
-            }
-
             $out = curl_exec($curl);
             curl_close($curl);
         }
@@ -60,7 +49,16 @@ trait Request {
             $out = curl_exec($curl);
             $curl_error = curl_error($curl);
             $curl_errno = curl_errno($curl);
-            var_dump($curl_error, $curl_errno);
+            if(config('app.debug')) {
+                $verbose_curl_output = fopen('php://temp', 'w+');
+                curl_setopt($curl, CURLOPT_VERBOSE, true);
+                curl_setopt($curl, CURLOPT_STDERR, $verbose_curl_output);
+
+                rewind($verbose_curl_output);
+                $verboseLog = stream_get_contents($verbose_curl_output);
+                fclose($verbose_curl_output);
+                TelegramLogger::writeDb('Verbose curl output:' . htmlspecialchars($verboseLog));
+            }
             curl_close($curl);
 
             if ($out === false) {
