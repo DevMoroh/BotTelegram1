@@ -14,17 +14,15 @@ class SubscribeCommand extends Command{
     public function execute()
     {
         // TODO: Implement execute() method.
-
             $message = $this->getMessage();
             $chat_id = $message->getChat()->getId();
             $userid = $message->getFrom();
 
-            $this->telegram->sendAswer(self::$command, $chat_id);
-
-            $user_service = UserService::find($userid)->first();
+            $user_service = UserService::where('external_id', $userid->id)->first();
             if($user_service) {
                 $user_service->subscribe = 1;
                 $user_service->save();
+                $this->telegram->sendAswer(self::$command, ['chat_id'=>$chat_id], $message->getMessageId());
             }
     }
 }

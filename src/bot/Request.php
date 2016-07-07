@@ -36,29 +36,33 @@ trait Request {
 
     public function _sendRequest($func, $data = []) {
 
-        $out = null;
-        
+        $out = [];
+
         if( $curl = curl_init() ) {
             $url = self::$_URL.$this->token.'/'.$func;
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
             curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                "Content-Type:multipart/form-data"
+            ]);
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-            $out = curl_exec($curl);
+            $out['data'] = json_decode(curl_exec($curl), true);
             $curl_error = curl_error($curl);
             $curl_errno = curl_errno($curl);
+            $out['http_code'] = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             if(config('app.debug')) {
-                $verbose_curl_output = fopen('php://temp', 'w+');
-                curl_setopt($curl, CURLOPT_VERBOSE, true);
-                curl_setopt($curl, CURLOPT_STDERR, $verbose_curl_output);
-
-                rewind($verbose_curl_output);
-                $verboseLog = stream_get_contents($verbose_curl_output);
-                fclose($verbose_curl_output);
-
-                TelegramLogger::writeLog(htmlspecialchars($verboseLog), 'updates');
+//                $verbose_curl_output = fopen('php://temp', 'w+');
+//                curl_setopt($curl, CURLOPT_VERBOSE, true);
+//                curl_setopt($curl, CURLOPT_STDERR, $verbose_curl_output);
+//
+//                rewind($verbose_curl_output);
+//                $verboseLog = stream_get_contents($verbose_curl_output);
+//                fclose($verbose_curl_output);
+//
+//                TelegramLogger::writeLog(htmlspecialchars($verboseLog), 'updates');
             }
             curl_close($curl);
 
@@ -66,20 +70,20 @@ trait Request {
                 throw new TelegramException($curl_error, $curl_errno);
             }
         }
-        return json_decode($out, true);
+        return $out;
     }
 
     public function _sendFile($type, $data, $file) {
 
         $result = null;
         if (!is_null($file)) {
-            $data[self::$types[$type]] = self::encodeFile($file);
+            $data['photo'] = $this->encodeFile(realpath($file));
             $result = $this->_sendRequest($type, $data);
         }
 
         //$url        = $bot_url . "sendPhoto?chat_id=" . $chat_id ;
 
-       // $data['photo'] = '@'.$path;
+        // $data['photo'] = '@'.$path;
 
 //        var_dump($data);exit;
 //        $ch = curl_init();
@@ -130,7 +134,7 @@ trait Request {
             $v = str_replace($disallow, "_", $v);
             $body[] = implode("\r\n", array(
                 "Content-Disposition: form-data; name=\"{$k}\"; filename=\"{$v}\"",
-               // "Content-Type: audio/mpeg",
+                // "Content-Type: audio/mpeg",
                 "",
                 $data,
             ));

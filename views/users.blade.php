@@ -42,40 +42,39 @@
                 </div>
             </div>
         </div><!--/.row-->
+        <script>
 
+            function actionFormatter(value) {
+                return [
+                    '<a class="remove" href="javascript:" title="Delete Item"><i class="glyphicon glyphicon-remove-circle"></i></a>',
+                ].join('');
+            }
+
+            window.actionEvents = {
+                'click .remove': function (e, value, row) {
+                    if (confirm('Вы уверены что хотите удалить юзера?')) {
+
+                        var API_URL = window.location.protocol+'//' + location.host + '/bot-telegram/users';
+
+                        var $table = $('#table').bootstrapTable({url: API_URL}),
+                                $modal = $('#modal').modal({show: false}),
+                                $alert = $('.alert').hide();
+                        $.ajaxSetup({ headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' } });
+                        $.ajax({
+                            url: API_URL + '/' + row.id,
+                            type: 'delete',
+                            success: function () {
+                                $table.bootstrapTable('refresh');
+                                showAlert('Delete item successful!', 'success');
+                            },
+                            error: function () {
+                                showAlert('Delete item error!', 'danger');
+                            }
+                        })
+                    }
+                }
+            };
+
+        </script>
 @endsection
 
-<script>
-
-    function actionFormatter(value) {
-        return [
-            '<a class="remove" href="javascript:" title="Delete Item"><i class="glyphicon glyphicon-remove-circle"></i></a>',
-        ].join('');
-    }
-
-    window.actionEvents = {
-        'click .remove': function (e, value, row) {
-            if (confirm('Вы уверены что хотите удалить юзера?')) {
-
-                var API_URL = window.location.protocol+'//' + location.host + '/bot-telegram/users';
-
-                var $table = $('#table').bootstrapTable({url: API_URL}),
-                        $modal = $('#modal').modal({show: false}),
-                        $alert = $('.alert').hide();
-                $.ajaxSetup({ headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' } });
-                $.ajax({
-                    url: API_URL + '/' + row.id,
-                    type: 'delete',
-                    success: function () {
-                        $table.bootstrapTable('refresh');
-                        showAlert('Delete item successful!', 'success');
-                    },
-                    error: function () {
-                        showAlert('Delete item error!', 'danger');
-                    }
-                })
-            }
-        }
-    };
-
-</script>

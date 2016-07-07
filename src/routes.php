@@ -16,11 +16,15 @@ Route::group(['prefix'=>'bot-telegram','namespace' => 'BotTelegram\Controllers',
 
     Route::get('/notifications_list', ['as'=>'bot-telegram-notifications_list','uses' => 'BotRequestController@notifications_list']);
 
+    Route::get('/messages_list', ['as'=>'bot-telegram-messages_list','uses' => 'BotRequestController@messages_list']);
+
     Route::resource('commands', 'TelegramCommandController');
 
     Route::resource('notifications', 'NotificationsController');
 
     Route::resource('users', 'UserServiceController');
+
+    Route::resource('messages', 'MessagesTelegram');
 
     Route::get('fileentry', 'FileEntryController@index');
     Route::get('fileentry/get/{filename}/{type}', ['as' => 'getentry', 'uses' => 'FileEntryController@get']);

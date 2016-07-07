@@ -45,6 +45,10 @@ class BotRequestController extends Controller{
         return View::make('bot-telegram::notifications');
     }
 
+    public function messages_list() {
+        return View::make('bot-telegram::messages');
+    }
+
     public function sendNotifications(Request $request) {
 
 //        $notifications = Notifications::where('status', 1)
@@ -115,8 +119,9 @@ class BotRequestController extends Controller{
 
     public function hook() {
         $BotTelegram = app('BotTelegram');
-        $BotTelegram->handle();
+        $BotTelegram->startRequest();
 
+        return 'OK';
     }
 
 }

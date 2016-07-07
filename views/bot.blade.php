@@ -91,11 +91,13 @@
             <input type="text" class="form-control" placeholder="Search">
         </div>
     </form>
+
     <ul class="nav menu">
         <li class="{{Request::is( 'bot-telegram') ? 'active' : ''}}"><a href="{{URL::to('/bot-telegram')}}"><svg class="glyph stroked dashboard-dial"><use xlink:href="#stroked-dashboard-dial"></use></svg> Панель телеграм</a></li>
         <li class="{{Request::is( 'bot-telegram/users_list') ? 'active' : ''}}"><a href="{{URL::to('/bot-telegram/users_list')}}"><svg class="glyph stroked calendar"><use xlink:href="#stroked-calendar"></use></svg>Сервис пользователи</a></li>
         <li class="{{Request::is( 'bot-telegram/commands_list') ? 'active' : ''}}"><a href="{{URL::to('/bot-telegram/commands_list')}}"><svg class="glyph stroked line-graph"><use xlink:href="#stroked-line-graph"></use></svg>Комманды</a></li>
         <li class="{{Request::is( 'bot-telegram/notifications_list') ? 'active' : ''}}"><a href="{{URL::to('/bot-telegram/notifications_list')}}"><svg class="glyph stroked line-graph"><use xlink:href="#stroked-line-graph"></use></svg>Уведомления</a></li>
+        <li class="{{Request::is( 'bot-telegram/messages_list') ? 'active' : ''}}"><a href="{{URL::to('/bot-telegram/messages_list')}}"><svg class="glyph stroked line-graph"><use xlink:href="#stroked-line-graph"></use></svg>Сообщения</a></li>
        <li class="parent ">
             <a href="#">
                 <span data-toggle="collapse" href="#sub-item-1"><svg class="glyph stroked chevron-down"><use xlink:href="#stroked-chevron-down"></use></svg></span> Dropdown

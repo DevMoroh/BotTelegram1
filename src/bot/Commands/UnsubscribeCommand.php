@@ -19,12 +19,12 @@ class UnsubscribeCommand extends Command{
             $chat_id = $message->getChat()->getId();
             $userid = $message->getFrom();
 
-            $this->telegram->sendAswer(self::$command, $chat_id);
-
-            $user_service = UserService::find($userid)->first();
+            $user_service = UserService::where('external_id', $userid->id)->first();
+           
             if($user_service) {
                 $user_service->subscribe = 0;
                 $user_service->save();
+                $this->telegram->sendAswer(self::$command, ['chat_id'=>$chat_id], $message->getMessageId());
             }
     }
 }
