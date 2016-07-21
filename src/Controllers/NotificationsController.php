@@ -4,6 +4,7 @@
 namespace BotTelegram\Controllers;
 use BotTelegram\bot\BotTelegram;
 use BotTelegram\Models\Notifications;
+use BotTelegram\Models\SendNote;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
@@ -12,6 +13,33 @@ use Symfony\Component\Console\Input\Input;
 
 class NotificationsController extends Controller{
 
+    public function startAt($id) {
+
+        $input = request()->input();
+        $valid = Validator::make(request()->input(), [
+            'start_at' => 'required|date_multi_format:"Y-m-d H:i", "Y-m-d H:i:s"|date_diff',
+           // 'start_at' => ''
+        ],
+        [
+            'start_at.required' => 'Заполните поле старта рассылки',
+            'start_at.date_diff' => 'Дата запуска не может быть прошлой',
+            'start_at.date_multi_format' => 'Не правильный формат даты должен быть - "Y-m-d H:i" или "Y-m-d H:i:s" ',
+        ]);
+
+        if ($valid->fails())
+        {
+            $result = $valid->messages();
+            return response()->json($result, 422);
+        }else{
+            $notification = Notifications::find($id);
+            $input['status_send'] = 0;
+            $notification->update($input);
+            $result = $notification->save();
+
+            return response()->json($notification->toArray());
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -19,6 +47,15 @@ class NotificationsController extends Controller{
      */
     public function index()
     {
+
+//           $notifications = Notifications::with('notes')->whereHas('notes', function($query) {
+//           // $query->where('loan_id', $id);
+//            $query->groupBy('send_note.notification_id');
+//            $query->orderBy('time_send', 'desc');
+//        })
+//               ->get();
+
+
         $notifications = Notifications::all();
         return response()->json($notifications->toArray());
     }

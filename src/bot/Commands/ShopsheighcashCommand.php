@@ -30,9 +30,8 @@ class ShopsheighcashCommand extends Command{
         $in = new InlineKeyboardMarkup(['inline_keyboard' => [$inline_keyboard]]);
 
         $this->telegram->sendAswer(self::$command, [
-            'chat_id'=>$chat_id,
             'reply_markup'=>$in.''
-        ], $message->getMessageId());
+        ]);
 
     }
 }

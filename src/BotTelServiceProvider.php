@@ -3,6 +3,7 @@
  namespace BotTelegram;
 
 use BotTelegram\Validators\BotValidator;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Validator;
 
@@ -42,6 +43,13 @@ class BotTelServiceProvider extends ServiceProvider {
 		$this->loadViewsFrom(__DIR__.'/../views', 'bot-telegram');
 
 		$this->app->singleton('BotTelegram', 'BotTelegram\bot\BotTelegram');
+
+		view()->composer('bot-telegram::commands', 'BotTelegram\Composers\TagsComposer');
+
+//		view()->composer('bot-telegram::commands', function($view) {
+//			$view->with('test', 34555);
+//			view()->share('js_files', static::$js_files);
+//		});
 		//		\Illuminate\Support\Facades\Validator::extend('eachFile', 'BotTelegram\Validators@eachFile');
 	}
 

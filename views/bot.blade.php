@@ -7,8 +7,11 @@
     <title>Lumino - Dashboard</title>
 
     <link href="{{asset('assets/css/bootstrap.min.css')}}" rel="stylesheet">
-    <link href="/assets/css/datepicker3.css" rel="stylesheet">
+    <link href="{{ asset("assets/css/datepicker3.css") }}" rel="stylesheet">
+    <link href="/assets/css/bootstrap-datetimepicker.css" rel="stylesheet">
     <link href="/assets/css/styles.css" rel="stylesheet">
+    <link href="/assets/tags/css/selectize.default.css" rel="stylesheet">
+    @stack('css_tags')
 
     <!--Icons-->
     <script src="/assets/js/lumino.glyphs.js"></script>
@@ -28,6 +31,8 @@
     <script src="/assets/js/bootstrap-table.js"></script>
     <script src="/assets/js/jquery.toaster.js"></script>
     <script src="/assets/js/main.js"></script>
+    <script src="/assets/tags/js/selectize.jquery.js"></script>
+    @stack('js_tags')
 </head>
 
 <body>
@@ -96,32 +101,19 @@
         <li class="{{Request::is( 'bot-telegram') ? 'active' : ''}}"><a href="{{URL::to('/bot-telegram')}}"><svg class="glyph stroked dashboard-dial"><use xlink:href="#stroked-dashboard-dial"></use></svg> Панель телеграм</a></li>
         <li class="{{Request::is( 'bot-telegram/users_list') ? 'active' : ''}}"><a href="{{URL::to('/bot-telegram/users_list')}}"><svg class="glyph stroked calendar"><use xlink:href="#stroked-calendar"></use></svg>Сервис пользователи</a></li>
         <li class="{{Request::is( 'bot-telegram/commands_list') ? 'active' : ''}}"><a href="{{URL::to('/bot-telegram/commands_list')}}"><svg class="glyph stroked line-graph"><use xlink:href="#stroked-line-graph"></use></svg>Комманды</a></li>
-        <li class="{{Request::is( 'bot-telegram/notifications_list') ? 'active' : ''}}"><a href="{{URL::to('/bot-telegram/notifications_list')}}"><svg class="glyph stroked line-graph"><use xlink:href="#stroked-line-graph"></use></svg>Уведомления</a></li>
         <li class="{{Request::is( 'bot-telegram/messages_list') ? 'active' : ''}}"><a href="{{URL::to('/bot-telegram/messages_list')}}"><svg class="glyph stroked line-graph"><use xlink:href="#stroked-line-graph"></use></svg>Сообщения</a></li>
-       <li class="parent ">
-            <a href="#">
-                <span data-toggle="collapse" href="#sub-item-1"><svg class="glyph stroked chevron-down"><use xlink:href="#stroked-chevron-down"></use></svg></span> Dropdown
+        <li class="{{Request::is( 'bot-telegram/tags_list') ? 'active' : ''}}"><a href="{{URL::to('/bot-telegram/tags_list')}}"><svg class="glyph stroked line-graph"><use xlink:href="#stroked-line-graph"></use></svg>Теги</a></li>
+        <li>
+            <a href="#" class="show-menu" data-toggle="" role="" aria-expanded="false">
+                <b>Уведомления</b> <span class="caret"></span>
             </a>
-            <ul class="children collapse" id="sub-item-1">
-                <li>
-                    <a class="" href="#">
-                        <svg class="glyph stroked chevron-right"><use xlink:href="#stroked-chevron-right"></use></svg> Sub Item 1
-                    </a>
-                </li>
-                <li>
-                    <a class="" href="#">
-                        <svg class="glyph stroked chevron-right"><use xlink:href="#stroked-chevron-right"></use></svg> Sub Item 2
-                    </a>
-                </li>
-                <li>
-                    <a class="" href="#">
-                        <svg class="glyph stroked chevron-right"><use xlink:href="#stroked-chevron-right"></use></svg> Sub Item 3
-                    </a>
-                </li>
+            <ul class="nav menu" role="menu">
+                <li class="{{Request::is( 'bot-telegram/notifications_list') ? 'active' : ''}}"><a href="{{URL::to('/bot-telegram/notifications_list')}}"><svg class="glyph stroked line-graph"><use xlink:href="#stroked-line-graph"></use></svg>Управл. уведомлениями</a></li>
+                <li class="{{Request::is( 'bot-telegram/notifications_logs') ? 'active' : ''}}"><a href="{{ url('bot-telegram/notifications_logs') }}">Логи отправок</a></li>
             </ul>
         </li>
         <li role="presentation" class="divider"></li>
-        <li><a href="login.html"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> Login Page</a></li>
+        {{--<li><a href="login.html"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> Login Page</a></li>--}}
     </ul>
 
 </div><!--/.sidebar-->

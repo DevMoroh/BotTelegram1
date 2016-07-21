@@ -3,8 +3,11 @@ namespace BotTelegram\bot;
 
 //use BotTelegram as BotTelegram;
 
+use BotTelegram\bot\Entities\ServerResponse;
 use BotTelegram\bot\Exception\TelegramException;
 use BotTelegram\bot\Logger\TelegramLogger;
+
+set_time_limit(0);
 
 trait Request {
 
@@ -36,41 +39,37 @@ trait Request {
 
     public function _sendRequest($func, $data = []) {
 
-        $out = [];
+        $out = null;
 
-        if( $curl = curl_init() ) {
-            $url = self::$_URL.$this->token.'/'.$func;
-            curl_setopt($curl, CURLOPT_URL, $url);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, [
-                "Content-Type:multipart/form-data"
-            ]);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-            $out['data'] = json_decode(curl_exec($curl), true);
-            $curl_error = curl_error($curl);
-            $curl_errno = curl_errno($curl);
-            $out['http_code'] = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            if(config('app.debug')) {
-//                $verbose_curl_output = fopen('php://temp', 'w+');
-//                curl_setopt($curl, CURLOPT_VERBOSE, true);
-//                curl_setopt($curl, CURLOPT_STDERR, $verbose_curl_output);
-//
-//                rewind($verbose_curl_output);
-//                $verboseLog = stream_get_contents($verbose_curl_output);
-//                fclose($verbose_curl_output);
-//
-//                TelegramLogger::writeLog(htmlspecialchars($verboseLog), 'updates');
-            }
-            curl_close($curl);
-
-            if ($out === false) {
-                throw new TelegramException($curl_error, $curl_errno);
-            }
+        $curl = curl_init();
+        if ($curl === false) {
+            throw new TelegramException('Curl failed to initialize');
         }
-        return $out;
+        $url = self::$_URL.$this->token.'/'.$func;
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT ,0);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 400); //timeout in seconds
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            "Content-Type:multipart/form-data"
+        ]);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        $out = curl_exec($curl);
+
+        $curl_error = curl_error($curl);
+        $curl_errno = curl_errno($curl);
+
+        if ($out === false) {
+            throw new TelegramException($curl_error, $curl_errno);
+        }
+
+        $response = json_decode($out, true);
+        curl_close($curl);
+
+        return new ServerResponse($response, $this->botname);
     }
 
     public function _sendFile($type, $data, $file) {

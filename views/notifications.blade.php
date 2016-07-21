@@ -35,6 +35,7 @@
                             <th data-field="message" data-sortable="false">Сообщение</th>
                             <th data-field="status" data-sortable="true">Статус</th>
                             <th data-field="photo" data-formatter="displayPhoto"  data-sortable="false">Картинка</th>
+                            <th data-field="start_at"  data-events="actionEvents" data-formatter="displayPlan"  data-sortable="false">Отложить запуск</th>
                             <th data-field="start" data-formatter="actionSubscribe" data-events="actionEvents" data-sortable="true">Рассылка</th>
                             <th data-field="action"
                                 data-align="center"
@@ -95,18 +96,50 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+    <div id="modal-plan" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="alert"></div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Время запланированого запуска:</label>
+                        <input type="text" class="form-control" name="startAt" placeholder="Время старта">
+                    </div>
+                    <br>
+                    <p>Информация о последней отправке:</p>
+                    <ul class="list-group">
+                        <li class="list-group-item counts"><b>Количество отправок:</b> <span>0</span></li>
+                        <li class="list-group-item status_send"><b>Статус:</b> <span>-</span></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary submit">Сохранить</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
     <div id="modal-shcedule" class="modal fade">
 
     </div>
-
+    <script src="/assets/js/bootstrap-datetimepicker.min.js"></script>
     <script>
         var API_URL = window.location.protocol+'//' + location.host + '/bot-telegram/notifications';
         var $table = $('#table').bootstrapTable({url: API_URL}),
                 $modal = $('#modal').modal({show: false}),
+                $modalPlan = $('#modal-plan').modal({show: false}),
                 $alert = $('.alert').hide();
             window.currentNoti = {};
         var _current = {};
         $(function () {
+
+            $("input[name='startAt']").datetimepicker({format: 'yyyy-mm-dd hh:ii'});
+
             $modal.find('input[name="status"]').change(function(e) {
                 ($(this).val() == "1") ? $(this).val("0") : $(this).val("1");
             });
@@ -124,7 +157,7 @@
             $('.create').click(function () {
                 showModal($(this).text());
             });
-            $(document).on("click", ".submit", function () {
+            $(document).on("click", "#modal .submit", function () {
                 var row = {}, imgs = $modal.find('input[type="radio"]:checked');
                 $modal.find('input[name], input[type="checkbox"]').each(function () {
                     row[$(this).attr('name')] = $(this).val();
@@ -154,6 +187,31 @@
                     }
                 });
             });
+
+            $(document).on("click", "#modal-plan .submit", function (e) {
+                var row = {}, URL = window.location.protocol+'//' + location.host + '/bot-telegram/notifications/startAt';
+                row.start_at = $("input[name='startAt']").val();
+                var url = ($modalPlan.data('id')) ? URL+'/'+$modalPlan.data('id') : URL+'';
+                var type = $modalPlan.data('id') ? 'PUT' : 'POST';
+                ajaxSend({
+                    type:type,
+                    data:row,
+                    messages:{
+                        bad:'Запись не обновилась! ',
+                        good:'Запись обновилась ) '
+                    },
+                    url:url,
+                    refresh:true,
+                    afterLoad:function(data) {
+
+                    },
+                    success:function() {
+                        $modalPlan.modal('hide');
+                        $table.bootstrapTable('refresh');
+                        showAlert(this.messages.good, 'success');
+                    }
+                });
+            });
         })
         function queryParams(params) {
             return {};
@@ -169,6 +227,12 @@
                     (value) ? '<img src="'+value+'" style="width:25%;min-height:100px;" />' : 'No image...'
             ];
         }
+
+        function displayPlan (value) {
+            return [
+                '<a class="plan" href="javascript:" title="Update Item">'+value+'<i class="glyphicon glyphicon-edit"></i></a>'
+            ].join('');
+        }
         function actionSubscribe(value, row) {
             var _class = (value == 1) ? "glyphicon-pause" : "glyphicon-play";
             var _text = (value == 1) ? "execution..." : "Start";
@@ -178,6 +242,9 @@
         }
         // update and delete events
         window.actionEvents = {
+            'click .plan': function (e, value, row) {
+                showModalPlan($(this).attr('title'), row);
+            },
             'click .update': function (e, value, row) {
                 _current = row;
                 showModal($(this).attr('title'), row);
@@ -262,6 +329,35 @@
             }
 
             $modal.modal('show');
+        }
+
+        function showModalPlan(title, row) {
+            $modalPlan.find('.modal-title').text(title);
+            row = row || {
+                        id: '',
+                        start_at: '0',
+                        status_send:'0',
+                        counts:'0'
+                    }; // default row value
+            //row.start_at = $("input[name='start_at']").val();
+            $modalPlan.find("input[name='startAt']").val(row.start_at);
+            var status = '';
+            switch(row.status_send) {
+                case 0:
+                        status = 'Не запущено';
+                break;
+                case 1:
+                        status = 'Запущено';
+                break;
+                case 2:
+                        status = 'Выполнено';
+                break;
+            }
+
+            $modalPlan.find(".status_send span").text(status);
+            $modalPlan.find(".counts span").text(row.counts);
+            $modalPlan.data('id', row.id);
+            $modalPlan.modal('show');
         }
 
         function showForm(row, title) {

@@ -19,7 +19,7 @@ class TelegramCommandController extends Controller{
      */
     public function index()
     {
-        $commands = CommandsTelegram::all();
+        $commands = CommandsTelegram::with('subcommands')->get();
         return response()->json($commands);
     }
 
@@ -56,7 +56,16 @@ class TelegramCommandController extends Controller{
             $result = $valid->messages();
             return response()->json($result, 422);
         }else{
-            $result = CommandsTelegram::create($request->input());
+            $cm = new CommandsTelegram;
+            $input = $request->input();
+            $cm->name = $input['name'];
+            $cm->message = $input['message'];
+            $cm->status = $input['status'];
+            $cm->type = $input['type'];
+            $result = $cm->save();
+            $cm->tags_list = ($input['tags_list']) ? $input['tags_list'] : "";
+
+          //  $result = CommandsTelegram::create($request->input());
             return response()->json($result);
         }
 
@@ -101,10 +110,10 @@ class TelegramCommandController extends Controller{
             $result = $valid->messages();
             return response()->json($result, 422);
         }else{
-            $command = CommandsTelegram::find($id)->first();
-            unset($input['id']);
-            $command->update($input);
-            $result = $command->save();
+            $command = CommandsTelegram::find($id);
+            $result = $command->update($input);
+            $command->save();
+            $command->tags_list = $input['tags_list'];
             return response()->json($result);
         }
 

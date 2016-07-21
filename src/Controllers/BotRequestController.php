@@ -1,18 +1,16 @@
 <?php
 
 namespace BotTelegram\Controllers;
-use App\Jobs\SendNotifications;
-use App\Jobs\SendUsers;
 use BotTelegram\bot\Test;
-use BotTelegram\Console\Commands\Clearer;
+use BotTelegram\Jobs\SendNotifications;
 use BotTelegram\Models\Notifications;
-use BotTelegram\Models\UserService;
+use BotTelegram\Models\SendUser;
+use BotTelegram\Models\TagsModel;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Contracts\Queue\Factory as FactoryContract;
 
 class BotRequestController extends Controller{
 
@@ -37,16 +35,37 @@ class BotRequestController extends Controller{
     }
 
     public function commands_list() {
-        return View::make('bot-telegram::commands');
+        $tags = TagsModel::all();
+        return View::make('bot-telegram::commands', ['tags'=>$tags]);
     }
 
 
     public function notifications_list() {
+        var_dump(Auth::user()->id);
         return View::make('bot-telegram::notifications');
     }
 
     public function messages_list() {
         return View::make('bot-telegram::messages');
+    }
+
+    public function notifications_logs() {
+        return View::make('bot-telegram::send-note');
+    }
+
+    public function tags_list() {
+
+        return View::make('bot-telegram::tags_list');
+    }
+
+    public function send_users($id) {
+        $users = SendUser::with(['user', 'notification'])->where(
+            [
+                'send_notice_id'=>$id
+            ]
+        )->get();
+
+        return response()->json($users);
     }
 
     public function sendNotifications(Request $request) {
@@ -76,6 +95,8 @@ class BotRequestController extends Controller{
         }
         return response()->json(['text'=>"Рассылка <b>{$notification->name}</b> запущена успешно!", 'status'=>'OK']);
     }
+
+    public function sendNotificationsSchedule(){}
 
 
     public function sendTest() {

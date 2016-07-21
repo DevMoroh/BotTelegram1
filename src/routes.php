@@ -18,6 +18,14 @@ Route::group(['prefix'=>'bot-telegram','namespace' => 'BotTelegram\Controllers',
 
     Route::get('/messages_list', ['as'=>'bot-telegram-messages_list','uses' => 'BotRequestController@messages_list']);
 
+    Route::get('/notifications_logs', 'BotRequestController@notifications_logs');
+
+    Route::get('/tags_list', 'BotRequestController@tags_list');
+
+    Route::get('/send_users/{id}', 'BotRequestController@send_users');
+
+    Route::get('/sendNotificationsSchedule', ['as'=>'bot-telegram-send_notifications_schedule','uses' => 'BotRequestController@sendNotificationsSchedule']);
+
     Route::resource('commands', 'TelegramCommandController');
 
     Route::resource('notifications', 'NotificationsController');
@@ -25,6 +33,12 @@ Route::group(['prefix'=>'bot-telegram','namespace' => 'BotTelegram\Controllers',
     Route::resource('users', 'UserServiceController');
 
     Route::resource('messages', 'MessagesTelegram');
+
+    Route::resource('send-notes', 'SendNoteController');
+
+    Route::resource('tags', 'TagsController');
+
+    Route::put('notifications/startAt/{id}', 'NotificationsController@startAt');
 
     Route::get('fileentry', 'FileEntryController@index');
     Route::get('fileentry/get/{filename}/{type}', ['as' => 'getentry', 'uses' => 'FileEntryController@get']);
@@ -34,24 +48,6 @@ Route::group(['prefix'=>'bot-telegram','namespace' => 'BotTelegram\Controllers',
     Route::get('fileentry/delete/{id}',  ['as' => 'deletefiles', 'uses' =>'FileEntryController@delete'])->where('id', '[0-9]+');
 
     Route::post('sendNotifications', ['uses'=>'BotRequestController@sendNotifications', 'middleware'=>['logdb']]);
-
-//    Route::get('startEvent', function() {
-//        $data = [
-//            'topic_id'=>'kittensCategory',
-//            'data'=>'test'
-//        ];
-//
-//        \BotTelegram\Socket\Pusher::sendDataToServer($data);
-//       // phpinfo();
-//        var_dump($data);
-//
-//    });
-
-   // Route::get('/commands', ['as'=>'bot-telegram-commands','uses' => 'TelegramCommandController@commands']);
-//
-//    Route::get('/notifications', ['as'=>'bot-telegram-users','uses' => 'BotRequestController@notifications']);
-//
-//    Route::get('/messages', ['as'=>'bot-telegram-users','uses' => 'BotRequestController@messages']);
 
     Route::any('/setHook', function() {
 

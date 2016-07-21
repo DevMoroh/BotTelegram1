@@ -25,7 +25,7 @@
                         <a class="create btn btn-default" href="javascript:">Добавить комманду</a>
                     </p>
                     <div class="alert"></div>
-                    <table data-toggle="table" data-url="{{URL::to('/bot-telegram/commands')}}" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-search="true" data-select-item-name="toolbar1" data-pagination="true" data-sort-name="name" data-sort-order="desc">
+                    <table id="table" data-toggle="table" data-url="{{URL::to('/bot-telegram/commands')}}" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-search="true" data-select-item-name="toolbar1" data-pagination="true" data-sort-name="name" data-sort-order="desc">
                         <thead>
                         <tr>
                             <th data-field="id" data-checkbox="true" >Ид</th>
@@ -60,6 +60,17 @@
                         <label>Имя</label>
                         <input type="text" class="form-control" name="name" placeholder="Имя">
                     </div>
+                    {{--{!! $tags !!}--}}
+                    <div class="form-group">
+                        <label>Ключевые слова</label>
+                        <select name="tags" class="tags-input" multiple id="">
+                            @if($tags)
+                                @foreach($tags as $tag)
+                                    <option value="{{$tag->id}}">{{$tag->name}}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label>Тип</label>
                         <input type="text" class="form-control" name="type" placeholder="Тип">
@@ -71,6 +82,36 @@
                     <div class="form-group">
                         <label>Статус</label>
                         <input type="checkbox" class="bs-checkbox" name="status">
+                    </div>
+                    {{--<button class="btn btn-primary addsubcommand g">Добавить подкоманду</button>--}}
+                    <div id="list_commands">
+                        {{--<h4 class="modal-title"><b>Список подкомманд:</b></h4>--}}
+                        {{--<hr>--}}
+                        {{--<div class="form-group">--}}
+                            {{--<label>Ключ подкоманды</label>--}}
+                            {{--<input type="text" class="form-control" name="type" placeholder="Тип">--}}
+                        {{--</div>--}}
+                        {{--<div class="form-group">--}}
+                            {{--<label>Ответное сообщение</label>--}}
+                            {{--<textarea type="text" class="form-control" name="message" placeholder="Ответное сообщение"></textarea>--}}
+                        {{--</div>--}}
+                        {{--<div class="form-group">--}}
+                            {{--<label>Системное</label>--}}
+                            {{--<input type="checkbox" class="bs-checkbox" name="system">--}}
+                        {{--</div>--}}
+                        {{--<hr>--}}
+                        {{--<div class="form-group">--}}
+                            {{--<label>Ключ подкоманды</label>--}}
+                            {{--<input type="text" class="form-control" name="type" placeholder="Тип">--}}
+                        {{--</div>--}}
+                        {{--<div class="form-group">--}}
+                            {{--<label>Ответное сообщение</label>--}}
+                            {{--<textarea type="text" class="form-control" name="message" placeholder="Ответное сообщение"></textarea>--}}
+                        {{--</div>--}}
+                        {{--<div class="form-group">--}}
+                            {{--<label>Системное</label>--}}
+                            {{--<input type="checkbox" class="bs-checkbox" name="system">--}}
+                        {{--</div>--}}
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -92,15 +133,29 @@
                 ($(this).val() == "1") ? $(this).val("0") : $(this).val("1");
             });
 
+            /*
+            * Создание новых данных
+            * */
             $('.create').click(function () {
                 showModal($(this).text());
             });
+
+            $('.addsubcommand').click(function(e) {
+                var id = $modal.data('id');
+                console.log(id);
+                var list = new ListCm('#list_commands', id);
+                //list.load();
+            });
+
+
             $modal.find('.submit').click(function () {
                 var row = {};
                 $modal.find('input[name], textarea[name], input[type="checkbox"]').each(function () {
                     row[$(this).attr('name')] = $(this).val();
                 });
                 row.message =  CKEDITOR.instances['message'].getData();
+                var multi = $modal.find('select[name="tags"]').val() || [];
+                row.tags_list = multi.join(',');
 
                 var p = ($modal.data('id')) ? '/'+$modal.data('id') : '';
                 var url = ($modal.data('id')) ? API_URL+'/'+$modal.data('id') : API_URL+'';
@@ -161,10 +216,13 @@
                         name: '',
                         message: '',
                         type: '',
-                        status: '0'
+                        status: '0',
+                        tags_list:[]
                     }; // default row value
             $modal.data('id', row.id);
             $modal.find('.modal-title').text(title);
+            //$modal.find('select[name="tags"]').val(row.tags_list);
+            $('select[name="tags"]')[0].selectize.setValue(row.tags_list);
             for (var name in row) {
                 $modal.find('input[name="' + name + '"]').val(row[name]);
                 if(name == 'message') {
@@ -202,4 +260,7 @@
             });
         })
     </script>
+    {{--@foreach($js_files as $js)--}}
+            {{--{{$js}}--}}
+    {{--@endforeach--}}
 @endsection

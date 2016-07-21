@@ -22,7 +22,7 @@ class SubscribeCommand extends Command{
             if($user_service) {
                 $user_service->subscribe = 1;
                 $user_service->save();
-                $this->telegram->sendAswer(self::$command, ['chat_id'=>$chat_id], $message->getMessageId());
+                $this->telegram->sendAswer(self::$command);
             }
     }
 }

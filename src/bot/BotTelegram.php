@@ -7,6 +7,7 @@ namespace BotTelegram\bot;
 //use App\Events\BotGeneration;
 use App\Jobs\BotSaveUpdates;
 use BotTelegram\bot\Entities\Message;
+use BotTelegram\bot\Entities\ServerResponse;
 use BotTelegram\bot\Entities\Update;
 use BotTelegram\bot\Entities\User;
 use BotTelegram\bot\Exception\TelegramException;
@@ -16,6 +17,7 @@ use BotTelegram\Models\MessagesTelegram;
 use BotTelegram\Models\Notifications;
 use BotTelegram\Models\UserService;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 
@@ -50,6 +52,12 @@ class BotTelegram {
     }
 
     public function sendMessage($data) {
+
+        $breaks = array("<br />","<br>","<br/>");
+        $data['text'] = str_ireplace($breaks, "\r\n", $data['text']);
+        $sp = ["&nbsp;", "&nbsp"];
+        $data['text'] = str_ireplace($sp, " ", $data['text']);
+
         $result = $this->_sendRequest('sendMessage', $data);
         return $result;
     }
@@ -115,6 +123,7 @@ class BotTelegram {
 
         $this->update = $update;
         $type =  $this->update->getUpdateType();
+        $command = '';
 
         var_dump($type);
 
@@ -126,8 +135,8 @@ class BotTelegram {
                     [
                         'message_id'=>$message->getMessageId(),
                         'text'=>$message->getText(true)
-                    ])->get()->toArray();
-                if(empty($m)) {
+                    ])->first();
+                if(!$m) {
 
                     $this->saveUpdates($message, $message->getFrom(), $typeService);
 
@@ -135,26 +144,31 @@ class BotTelegram {
                     // var_dump($type_mess);exit;
                     if ($type_mess === 'command') {
                         $command = $message->getCommand();
-
-                        $this->executeCommand($command, $message);
+                        $this->executeCommand($command);
+                    }else{
+                        $this->wordParse($message);
                     }
+                    //$this->preExecuteCommand($command, $message);
                 }
                 break;
             case 'message':
                    $message =  $this->update->getMessage();
 //                    Event::fire(new BotGeneration($message->getFrom(), $message, 'telegram'));
-                   $m = MessagesTelegram::where(['message_id'=>$message->getMessageId()])->get()->toArray();
-                   if(empty($m)) {
+                   $m = MessagesTelegram::where(['message_id'=>$message->getMessageId()])->first();
 
+                   if(!$m) {
                        $this->saveUpdates($message, $message->getFrom(), $typeService);
 
                        $type_mess = $message->getType();
                        // var_dump($type_mess);exit;
                        if ($type_mess === 'command') {
                            $command = $message->getCommand();
-
-                           $this->executeCommand($command, $message);
+                           $this->executeCommand($command);
+                       }else{
+                           $this->wordParse($message);
                        }
+
+                       //$this->preExecuteCommand($command, $message);
                    }
                 break;
         }
@@ -180,7 +194,7 @@ class BotTelegram {
                    'first_name' => $user->first_name,
                    'last_name' => $user->last_name,
                    'service' => $type,
-                   'external_id' => $user->id,
+                   'external_id' => $user->getId(),
                    'username' => $user->username,
                    'chat' => $message->getChat()->getId(),
                    'status' => 1,
@@ -221,14 +235,58 @@ class BotTelegram {
             //$this->pushFire();
     }
 
-    public function executeCommand($command, $message) {
+    public function preExecuteCommand($command = '', $message) {
+        $typeCommand = \Config('telegram_bot.type');
+
+        switch($typeCommand) {
+            case "command":
+                $this->executeCommand($command);
+                break;
+            case "word_parse":
+                $this->wordParse($message);
+                break;
+        }
+    }
+    //SELECT ct.* FROM commands_telegram ct, tags, tags_objects `to` WHERE to.tag_id = tags.id AND to.object_id = ct.id AND tags.name = 'Летишопс';
+    public function wordParse(Message $message) {
+
+        DB::enableQueryLog();
+        $text = $message->getText();
+        $chat_id = $message->getChat()->getId();
+
+        $result = "";
+        $list = explode(" ", $text);
+        if($list) {
+            foreach ($list as $li) {
+                if($li && mb_strlen($li, 'UTF-8') > 2) {
+                    $result .= $li."* ";
+                }
+            }
+        }
+
+        $commands = CommandsTelegram::join('tags_objects', 'commands_telegram.id', '=', 'tags_objects.object_id')
+            ->join('tags', function($join) {
+                $join->on('tags.id', '=', 'tags_objects.tag_id');
+            })
+            ->whereRaw("MATCH(tags.name) AGAINST(? IN BOOLEAN MODE)",[$result])
+            ->get();
+
+       // dd(DB::getQueryLog());
+        if($commands) {
+              foreach ($commands as $command) {
+                  $type = str_replace("/", "", $command->type);
+                  $this->executeCommand($type);
+              }
+        }
+    }
+
+    public function executeCommand($command) {
         $object = $this->getCommndObject($command);
+        // dd($object);
         if($object && $object instanceof Command) {
             $object->execute();
         }else{
-           $this->sendAswer('/' . $command, [
-               'chat_id'=>$message->getChat()->getId(),
-           ], $message->getMessageId());
+           $this->sendAswer('/' . $command);
         }
     }
 
@@ -271,26 +329,43 @@ class BotTelegram {
     /* 
     *   Отправка ответа на команды и простые сообщения
     */
-    public function sendAswer($command, array $data, $message_id) {
-       $answere = CommandsTelegram::where('type', $command)->where('status', 1)->first();
+    public function sendAswer($command, array $data = []) {
+        $answere = CommandsTelegram::where('type', $command)->where('status', 1)->first();
+        $_data = [];
         //var_dump($answere);
-
+        $message_telegram = $this->update->getMessage();
         if($answere) {
-            $data['text'] = $answere->message;
-            $data['parse_mode'] = 'HTML';
+            $_data['text'] =  "★★★  ".$answere->message."\n\n• • •\n\n";
+            $_data['parse_mode'] = 'HTML';
+            //$_data['reply_to_message_id'] = $message_telegram->getMessageId();
+            $_data['chat_id'] = $message_telegram->getChat()->getId();
+            $data = array_merge($data, $_data);
             $result = $this->sendMessage($data);
-            if($result['data']['ok']) {
-                $mid = $result['data']['result']['message_id'];
-                $message = MessagesTelegram::where(
+            $this->saveAnswer($result);
+        }
+    }
+    
+    public function saveAnswer(ServerResponse $response) {
+       // dd($response);
+        if(!$response->isOk()) return false;
+
+        $result = $response->getResult();
+        if($result instanceof Message) {
+            $answere = $result->getText();
+            $message_telegram =  $this->update->getMessage();
+            $message_id = $result->getMessageId();
+            if($message_telegram) {
+                $_message = MessagesTelegram::where(
                     [
-                       'message_id'=>$message_id,
-                    ])->first();
-                if($message) {
-                    $message->update(['answer' => $answere->message, 'approved'=>1, 'message_answer_id'=>$mid]);
-                    $message->save();
-                }
+                        'message_id'=>$message_telegram->getMessageId()
+                    ]
+                )->first();
+
+                $_message->update(['answer' => $answere, 'approved'=>1, 'message_answer_id'=>$message_id]);
+                return $_message->save();
             }
         }
+
     }
 
 }
