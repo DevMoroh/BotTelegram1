@@ -108,7 +108,8 @@ class StartCommand extends Command{
     }
 
     protected function getHashUser($uid) {
-        $service_url = "https://letyshops.modelfak.bissdata-home.com/api/telegram?uid=".$uid;
+        $url = \Config('telegram_bot.api_url');
+        $service_url = $url.$uid;
 
         $curl = curl_init($service_url);
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
