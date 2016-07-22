@@ -22,9 +22,9 @@ class StartCommand extends Command{
     public function execute()
     {
         // TODO: Implement execute() method.
-            $message = $this->getMessage();
-            $chat_id = $message->getChat()->getId();
-            $userid = $message->getFrom();
+        $message = $this->getMessage();
+        $chat_id = $message->getChat()->getId();
+        $userid = $message->getFrom();
 
         $keyboard_button = [
             new KeyboardButton(['text' => 'Комманда']),
@@ -53,7 +53,7 @@ class StartCommand extends Command{
 
     }
 
-    protected function subcommand($message) {
+    public function subcommand($message) {
         $text = $message->getText(true);
         if(!$text) return false;
 
@@ -67,20 +67,24 @@ class StartCommand extends Command{
         $_salt = \Config('telegram_bot.salt');
 
         $data = $this->getHashUser($user_id);
-        $hash = $data['hash'];
 
-        if(!empty($hash) && preg_match('/^[a-f0-9]{32}$/', $hash)) {
-            throw new StartException("Invalid data format must be md5", 2);
+        if(!$data || !isset($data['hash'])) {
+            throw new StartException("Invalid data from letyshops -- not found hash or user_id", 3);
         }
 
-        if(!$data || !isset($data['hash']) || !isset($data['user_id'])) {
-            throw new StartException("Invalid data from letyshops -- not found hash or user_id", 3);
+        $hash = $data['hash'];
+
+        if(!$data || !isset($data['hash'])) {
+            throw new StartException("Return empty data", 2);
+        }
+
+        if(!preg_match('/^[a-f0-9]{32}$/', $hash)) {
+            throw new StartException("Invalid data format must be md5", 2);
         }
 
         if ($token !== md5($user_id . $hash . $_salt)) {
             throw new StartException("hash is not valid", 4);
         }
-
 
         $user_service = UserService::where('external_id', '=', $message->getFrom()->getId())
             ->first();
@@ -107,9 +111,8 @@ class StartCommand extends Command{
         return $user_service->save();
     }
 
-    protected function getHashUser($uid) {
-        $url = \Config('telegram_bot.api_url');
-        $service_url = $url.$uid;
+    public function getHashUser($uid) {
+        $service_url = "https://letyshops.modelfak.bissdata-home.com/api/telegram?uid=".$uid;
 
         $curl = curl_init($service_url);
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
