@@ -8,6 +8,7 @@
 
 namespace BotTelegram\Validators;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Validator;
 
 class BotValidator extends Validator {
@@ -39,6 +40,42 @@ class BotValidator extends Validator {
             $result = $this->validateMimes(sprintf( 'files.%d', $key ), $image, $parameters);
         }
         return $result;
+    }
+
+    /*
+     * Валидация даты по нескольким форматам
+     *  */
+    public function validateDateMultiFormat($attribute, $value, $formats) {
+        // iterate through all formats
+        foreach($formats as $format) {
+
+            // parse date with current format
+            $parsed = date_parse_from_format($format, $value);
+
+            // if value matches given format return true=validation succeeded
+            if ($parsed['error_count'] === 0 && $parsed['warning_count'] === 0) {
+                return true;
+            }
+        }
+
+        // value did not match any of the provided formats, so return false=validation failed
+        return false;
+    }
+
+    /*
+     * date_diff
+     *  */
+    public function validateDateDiff($attribute, $value, $parameters) {
+
+        if(!empty($value)) {
+            $date_new = strtotime($value);
+            $date_now = time();
+            //$value = DB::table($table)->pluck($column);
+
+            if($date_new <= $date_now)
+                return false;
+        }
+        return true;
     }
 
     public function messages()
