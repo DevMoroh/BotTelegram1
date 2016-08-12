@@ -46,7 +46,6 @@
         </div>
     </div><!--/.row-->
 
-
     <div id="modal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -195,7 +194,7 @@
             },
             'click .remove': function (e, value, row) {
                 if (confirm('Вы уверены что хотите удалить комманду?')) {
-
+                    console.log(row);
                     ajaxSend({
                         type:'delete',
                         messages:{ bad:'Ошибка удаления!', good:'Удаление прошло успешно!'},

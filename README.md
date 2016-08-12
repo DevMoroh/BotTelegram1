@@ -1,4 +1,4 @@
-rhc port-forward -a php
+rhc port-forward -a bot
 
 # Для запуском и управления монитора процессов
 sudo supervisord -c /etc/supervisor/supervisord.conf

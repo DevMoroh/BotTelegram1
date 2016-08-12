@@ -2,6 +2,6 @@
 
 return [
 
-    'token'=>'dd',
+    'token'=>'',
     'bot_name'=>''
 ];

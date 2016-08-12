@@ -4,6 +4,7 @@ namespace BotTelegram\Jobs;
 
 use App\Jobs\Job;
 use BotTelegram\Models\SendUser;
+use BotTelegram\Socket\Pusher;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -121,7 +122,7 @@ class SendUsers extends Job implements ShouldQueue
 //                'param'=>$this->job->()
              ]
         ];
-        //Pusher::sendDataToServer($data);
+        Pusher::sendDataToServer($data);
     }
     public function reconnectDb() {
         try {

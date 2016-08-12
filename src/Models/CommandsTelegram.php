@@ -43,6 +43,7 @@ class CommandsTelegram extends Model {
             $tag_ids = explode(',', $tag_ids);
             $this->tags()->sync($tag_ids);
         }
+
     }
 
     public function subcommands() {

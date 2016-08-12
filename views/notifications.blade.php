@@ -1,5 +1,4 @@
 
-
 @extends('bot-telegram::bot')
 
 @section('content')

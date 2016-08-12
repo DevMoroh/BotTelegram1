@@ -71,5 +71,6 @@ Route::group(['prefix'=>'bot-telegram','namespace' => 'BotTelegram\Controllers',
     });
 
 });
+Route::any('/bot-telegram/sendMessage', ['uses'=>'BotTelegram\Controllers\BotRequestController@sendMessage', 'middleware'=>['web']]);
 
 Route::any('/bot-telegram/hook', ['as' => 'bot-telegram-hook','uses' => 'BotTelegram\Controllers\BotRequestController@hook', 'middleware'=>['web']]);

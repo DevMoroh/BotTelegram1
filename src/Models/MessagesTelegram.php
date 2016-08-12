@@ -23,4 +23,5 @@ class MessagesTelegram extends Model {
     public function users() {
         return $this->hasOne('BotTelegram\Models\UserService', 'external_id', 'from');
     }
+    
 }

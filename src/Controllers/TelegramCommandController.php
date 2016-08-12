@@ -70,6 +70,7 @@ class TelegramCommandController extends Controller{
         }
 
     }
+    
 
     /**
      * Display the specified resource.

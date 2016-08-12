@@ -1,5 +1,6 @@
 @extends('bot-telegram::bot')
 
+
 @section('content')
     <div class="row">
         <ol class="breadcrumb">

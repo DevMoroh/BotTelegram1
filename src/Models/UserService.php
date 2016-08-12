@@ -45,8 +45,7 @@ class UserService extends Model {
         {
             // do stuff
         });
-
-
+        
     }
 
     public function messages()

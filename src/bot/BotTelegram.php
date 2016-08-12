@@ -112,9 +112,10 @@ class BotTelegram {
     public function startRequest() {
         $data = $this->getDataInput();
         $update = new Update($data, $this->botname);
-        $this->dispatch(
-            new BotSaveUpdates($update, 'telegram')
-        );
+        app('BotTelegram')->handle($update, 'telegram');
+//        $this->dispatch(
+//            new BotSaveUpdates($update, 'telegram')
+//        );
     }
 
     public function handle(Update $update, $typeService) {
@@ -126,7 +127,6 @@ class BotTelegram {
         $command = '';
 
         var_dump($type);
-
         switch($type) {
             case 'edited_message':
                 $message =  $this->update->getEditedMessage();
@@ -160,7 +160,7 @@ class BotTelegram {
                        $this->saveUpdates($message, $message->getFrom(), $typeService);
 
                        $type_mess = $message->getType();
-                       // var_dump($type_mess);exit;
+//                       var_dump($type_mess);
                        if ($type_mess === 'command') {
                            $command = $message->getCommand();
                            $this->executeCommand($command);
@@ -269,12 +269,17 @@ class BotTelegram {
                 $join->on('tags.id', '=', 'tags_objects.tag_id');
             })
             ->whereRaw("MATCH(tags.name) AGAINST(? IN BOOLEAN MODE)",[$result])
+            ->selectRaw("commands_telegram.id, commands_telegram.type, commands_telegram.name, (MATCH(tags.name) AGAINST(? IN BOOLEAN MODE)) as rel",[$result])
+            ->groupBy('commands_telegram.id')
+            ->orderBy('rel', 'DESC')
             ->get();
 
-       // dd(DB::getQueryLog());
+        //dd(DB::getQueryLog());
+       // var_dump($commands);
         if($commands) {
               foreach ($commands as $command) {
                   $type = str_replace("/", "", $command->type);
+                  var_dump($command->rel);
                   $this->executeCommand($type);
               }
         }
@@ -282,7 +287,8 @@ class BotTelegram {
 
     public function executeCommand($command) {
         $object = $this->getCommndObject($command);
-        // dd($object);
+//         dd($object);
+        //var_dump($object);
         if($object && $object instanceof Command) {
             $object->execute();
         }else{
@@ -330,19 +336,25 @@ class BotTelegram {
     *   Отправка ответа на команды и простые сообщения
     */
     public function sendAswer($command, array $data = []) {
-        $answere = CommandsTelegram::where('type', $command)->where('status', 1)->first();
-        $_data = [];
-        //var_dump($answere);
-        $message_telegram = $this->update->getMessage();
-        if($answere) {
-            $_data['text'] =  "★★★  ".$answere->message."\n\n• • •\n\n";
-            $_data['parse_mode'] = 'HTML';
-            //$_data['reply_to_message_id'] = $message_telegram->getMessageId();
-            $_data['chat_id'] = $message_telegram->getChat()->getId();
-            $data = array_merge($data, $_data);
-            $result = $this->sendMessage($data);
-            $this->saveAnswer($result);
+        $answere_message = '';
+        if(!isset($data['text'])) {
+            $answere = CommandsTelegram::where('type', $command)->where('status', 1)->first();
+            $answere_message = ($answere) ? $answere->message : '';
+        }else{
+            $answere_message = $data['text'];
         }
+        $_data = [];
+
+        $message_telegram = $this->update->getMessage();
+         if($answere_message) {
+             $_data['text'] = "★★★  " . $answere_message . "\n\n• • •\n\n";
+             $_data['parse_mode'] = 'HTML';
+             //$_data['reply_to_message_id'] = $message_telegram->getMessageId();
+             $_data['chat_id'] = $message_telegram->getChat()->getId();
+             $data = array_merge($_data, $data);
+             $result = $this->sendMessage($data);
+             $this->saveAnswer($result);
+         }
     }
     
     public function saveAnswer(ServerResponse $response) {
@@ -360,9 +372,12 @@ class BotTelegram {
                         'message_id'=>$message_telegram->getMessageId()
                     ]
                 )->first();
+                if($_message) {
+                    $_message->update(['answer' => $answere, 'approved' => 1, 'message_answer_id' => $message_id]);
+                    return $_message->save();
+                }
 
-                $_message->update(['answer' => $answere, 'approved'=>1, 'message_answer_id'=>$message_id]);
-                return $_message->save();
+                return false;
             }
         }
 

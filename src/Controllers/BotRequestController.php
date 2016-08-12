@@ -1,6 +1,7 @@
 <?php
 
 namespace BotTelegram\Controllers;
+use BotTelegram\Requests\TelegramRequest;
 use BotTelegram\bot\Test;
 use BotTelegram\Jobs\SendNotifications;
 use BotTelegram\Models\Notifications;
@@ -80,6 +81,7 @@ class BotRequestController extends Controller{
             return response()->json(['text'=>'Данного уведомления несуществует....', 'status'=>'FAIL']);
         }
 
+        
         if($notification->start == 1) {
             return response()->json(['text'=>"Рассылка <b>{$notification->name}</b> уже запущена....", 'status'=>'FAIL']);
         }
@@ -96,9 +98,30 @@ class BotRequestController extends Controller{
         return response()->json(['text'=>"Рассылка <b>{$notification->name}</b> запущена успешно!", 'status'=>'OK']);
     }
 
+    /**
+     * @param TelegramRequest $request
+     * @return string
+     */
+    public function sendMessage(TelegramRequest $request) {
+        $input = $request->input();
+        $token = $input['token'];
+        $text = $input['text'];
+
+        $user = app('AuthBotTelegram')->isAuth($token);
+        if($user) {
+            app('BotTelegram')->sendMessage([
+                'text'=>$text,
+                'chat_id'=>$user->chat
+            ]);
+            return response()->json(['result'=>true, 'message'=>'success!'], 201);
+        }
+
+        return response()->json(['result'=>false, 'message'=>'fail!'], 201);
+
+    }
+    
     public function sendNotificationsSchedule(){}
-
-
+    
     public function sendTest() {
 
         $test = new Test();
