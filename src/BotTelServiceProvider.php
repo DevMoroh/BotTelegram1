@@ -46,8 +46,6 @@ class BotTelServiceProvider extends ServiceProvider {
 		$this->app->singleton('AuthBotTelegram', 'BotTelegram\bot\Auth');
 
 		view()->composer('bot-telegram::commands', 'BotTelegram\Composers\TagsComposer');
-
-		
 //		view()->composer('bot-telegram::commands', function($view) {
 //			$view->with('test', 34555);
 //			view()->share('js_files', static::$js_files);

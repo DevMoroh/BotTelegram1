@@ -13,11 +13,12 @@ use Symfony\Component\Console\Input\Input;
 
 class NotificationsController extends Controller{
 
+
     public function startAt($id) {
 
         $input = request()->input();
         $valid = Validator::make(request()->input(), [
-            'start_at' => 'required|date_multi_format:"Y-m-d H:i", "Y-m-d H:i:s"|date_diff',
+            'start_at' => 'required|date_multi_format:"Y-m-d H:i"',
            // 'start_at' => ''
         ],
         [

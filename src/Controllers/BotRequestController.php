@@ -7,6 +7,7 @@ use BotTelegram\Jobs\SendNotifications;
 use BotTelegram\Models\Notifications;
 use BotTelegram\Models\SendUser;
 use BotTelegram\Models\TagsModel;
+use Guzzle\Http\Client;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
@@ -130,35 +131,7 @@ class BotRequestController extends Controller{
     }
 
     public function addTestAccounts() {
-
-        $mid = 1000000;
-        $from = 1000000;
-        $date = time();
-        $chatid = 1000000;
-
-        for($i=0; $i < 1000; $i++) {
-            $mid++;
-            $from++;
-            $chatid++;
-
-//            MessagesTelegram::create([
-//                'message_id' => $mid,
-//                'from'=>$from,
-//                'date'=>$date,
-//                'chat'=>$chatid,
-//                'type'=>'test',
-//                'text'=>'test message'
-//            ]);
-//
-//            UserService::create([
-//                'first_name'=>'Test',
-//                'last_name'=>'Test',
-//                'time_create'=>$date,
-//                'external_id'=>$from,
-//                'status'=>'1',
-//                'service'=>'telegram'
-//            ]);
-        }
+        
     }
 
     public function hook() {

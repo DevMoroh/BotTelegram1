@@ -1,0 +1,3 @@
+[2016-08-22 07:43:42] name.WARNING: Foo'Ошибка curl: Failed to connect to letyshops.modelfak.bissdata-home.com port 443: Connection timed out' [] []
+[2016-08-22 07:49:03] name.WARNING: Foo'Ошибка curl: Failed to connect to letyshops.modelfak.bissdata-home.com port 443: No route to host' [] []
+[2016-08-22 07:54:06] name.WARNING: Foo'Ошибка curl: Failed to connect to letyshops.modelfak.bissdata-home.com port 443: No route to host' [] []

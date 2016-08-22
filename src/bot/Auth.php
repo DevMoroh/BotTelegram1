@@ -8,7 +8,7 @@ use BotTelegram\Models\UserService;
 class Auth {
 
     public function isAuth($token) {
-       $user = null;
+        $user = null;
         try {
             $result = $this->decript_hash(\Config('telegram_bot.salt'), $token);
 
@@ -17,7 +17,7 @@ class Auth {
                 //var_dump($user);
             }
         }catch(\Exception $e) {
-           // echo $e->getMessage();
+            // echo $e->getMessage();
             return false;
         }
         return ($user) ? $user : false;
@@ -107,16 +107,19 @@ class Auth {
         $response = $curl_response;
 
         /* логирование респонсов с апишки */
-        if($curl_response === false)
+        if($curl_response === false || $httpcode !== 200)
         {
-            TelegramLogger::writeLog('Ошибка curl: ' . curl_error($curl), 'api_lety');
+            TelegramLogger::writeLog('Ошибка curl: ' . curl_error($curl) .' api_lety - code '.$httpcode, 'api_lety');
         }
         if( $response ) {
             TelegramLogger::writeLog($response, 'api_lety');
         }
         curl_close($curl);
 
-        return $response;
+        return [
+            'result'=>$response,
+            'code'=>$httpcode
+        ];
     }
 
 }

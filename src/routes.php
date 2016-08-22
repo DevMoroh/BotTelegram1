@@ -62,15 +62,44 @@ Route::group(['prefix'=>'bot-telegram','namespace' => 'BotTelegram\Controllers',
         return $bot->getData(true);
     });
 
-    Route::any('/test', function() {
+    Route::any('/sendUpdate', function() {
 
-        $type = \Illuminate\Support\Facades\Input::get('type');
-        $data = \Illuminate\Support\Facades\Input::get('data');
-        $bot = new \BotTelegram\bot\BotTelegram();
-        var_dump($bot->_sendRequest($type, $data));
+        $command = (isset($_GET['command'])) ? $_GET['command'] : '/help';
+        $update = '{ "update_id":679940511,
+                     "message":{
+                            "message_id":'.mt_rand(10043, 99999).',
+                             "from":{
+                                      "id":231647617,
+                                       "first_name":"Roma",
+                                       "last_name":"Modelfak",
+                                       "username":"modelfak"
+                                     },
+                             "chat":{ 
+                                      "id":231647617,
+                                      "first_name":"Roma",
+                                      "last_name":"Modelfak",
+                                      "username":"modelfak",
+                                      "type":"private"
+                                    },
+                             "date":1466067290,
+                             "text":"'.$command.'",
+                             "entities":[{"type":"bot_command","offset":0,"length":7}]
+                             }       
+                     }';
+
+        $client = new \GuzzleHttp\Client();
+        try{
+            $response = $client->post("http://localhost:8000/bot-telegram/hook", ['body' => $update, 'future' => true]);
+            $r = $response->getBody()->getContents();
+        }catch(\GuzzleHttp\Exception\ServerException $e) {
+            $r = $e->getMessage();
+        }
+        return $r;
+
     });
 
 });
+
 Route::any('/bot-telegram/sendMessage', ['uses'=>'BotTelegram\Controllers\BotRequestController@sendMessage', 'middleware'=>['web']]);
 
 Route::any('/bot-telegram/hook', ['as' => 'bot-telegram-hook','uses' => 'BotTelegram\Controllers\BotRequestController@hook', 'middleware'=>['web']]);

@@ -354,6 +354,8 @@ class BotTelegram {
              $data = array_merge($_data, $data);
              $result = $this->sendMessage($data);
              $this->saveAnswer($result);
+             
+             return $result;
          }
     }
     

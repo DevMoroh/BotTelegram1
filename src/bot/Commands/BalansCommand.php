@@ -26,8 +26,10 @@ class BalansCommand extends Command{
 
             $balans = $this->getBalans($token);
 
-            if ($balans) {
-                $this->telegram->sendAswer(self::$command, ['text' => $balans]);
+            var_dump($balans);
+
+            if ($balans['result']) {
+                $this->telegram->sendAswer(self::$command, ['text' => $balans['result']]);
             }
         }else{
             $this->telegram->sendAswer(self::$command, ['text' => "Привяжите ваш аккаунт к letyshops.ru по ссылке - https://letyshops.modelfak.bissdata-home.com/telegram"]);
