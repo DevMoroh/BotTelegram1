@@ -51,9 +51,18 @@ Route::group(['prefix'=>'bot-telegram','namespace' => 'BotTelegram\Controllers',
 
     Route::any('/setHook', function() {
 
-            $url = \Illuminate\Support\Facades\Input::get('url');
-            $bot = new \BotTelegram\bot\BotTelegram();
-            var_dump($bot->setHook(['url'=>$url]));
+        $url = \Illuminate\Support\Facades\Input::get('url');
+        $bot = new \BotTelegram\bot\BotTelegram();
+        $cert_pem_path = $_SERVER['DOCUMENT_ROOT'].'/cer.pem';
+
+        $data = [
+            'url'=>$url
+        ];
+         if(isset($_GET['certificate'])) {
+             $file = $bot->encodeFile($cert_pem_path);
+             $data['certificate'] = $file;
+         }
+        var_dump($bot->setHook($data));
     });
 
     Route::any('/getUpdates', function() {
