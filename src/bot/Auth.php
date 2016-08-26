@@ -86,8 +86,10 @@ class Auth {
     public function sendDataToLety($service_url) {
 
         $curl = curl_init($service_url);
-        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($curl, CURLOPT_USERPWD, "bissdata:bissdata"); //Your credentials goes here
+        if(env('APP_DEBUG')) {
+            curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            curl_setopt($curl, CURLOPT_USERPWD, "bissdata:bissdata"); //Your credentials goes here
+        }
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         // curl_setopt($curl, CURLOPT_POST, true);
 //        curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
@@ -98,14 +100,10 @@ class Auth {
         $curl_error = curl_error($curl);
         $curl_errno = curl_errno($curl);
 
-        var_dump($curl_response);
-
         if($curl_response === false || $curl_response == NULL) {
             var_dump($curl_error, $curl_errno);
         }
-
         $response = $curl_response;
-
         /* логирование респонсов с апишки */
         if($curl_response === false || $httpcode !== 200)
         {
