@@ -30,16 +30,13 @@ class UserController extends BaseController {
         ];
         $BotTelegram->sendMessage($data);
 
-
-
-
         return response()->json($result);
     }
 
 
     public function hook() {
 
-        $BotTelegram = new BotTelegram('187976149:-PA2j6cTU1vrZM', '');
+        $BotTelegram = new BotTelegram(env('bottelegram.key'), '');
         $data = $BotTelegram->getData();
         $message = $data['message'];
         $chatId  = $data['chat_id'];

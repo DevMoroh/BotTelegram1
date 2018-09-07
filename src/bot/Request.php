@@ -79,21 +79,6 @@ trait Request {
             $data['photo'] = $this->encodeFile(realpath($file));
             $result = $this->_sendRequest($type, $data);
         }
-
-        //$url        = $bot_url . "sendPhoto?chat_id=" . $chat_id ;
-
-        // $data['photo'] = '@'.$path;
-
-//        var_dump($data);exit;
-//        $ch = curl_init();
-//
-//        $array2=array(self::$types[$type]=>$path);
-//        $ch = curl_init();
-//
-//        curl_setopt($ch, CURLOPT_URL, $url);
-//        $this->curl_custom_postfields($ch, $data, $array2);
-//        $output=curl_exec($ch);
-//        curl_close($ch);
         return $result;
     }
 
@@ -229,7 +214,6 @@ trait Request {
         if($data) {
             TelegramLogger::writeLog($data, 'updates');
         }
-//        var_dump(json_decode($data, true));exit;
         return json_decode($data, true);
     }
 
